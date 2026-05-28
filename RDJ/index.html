@@ -8,33 +8,46 @@
     <link rel="icon" type="image/x-icon" href="/favicon.png">
     <style>
         .iframe-container {
+            position: relative;
             text-align: center;
             position: absolute;
             top: 0; left: 0;
             width: 100%;
             height: 100%;
             border: none;
+            z-index: 1;
         }
 
         .iframe-container iframe {
+            position: relative;
             display: block;
             margin: 0 auto;
             width: 100%;
             height: 99vh;
+            z-index: 1;
         }
 
         .footer {
-            margin-top: 50px;
-            font-size: 0.8rem;
-            color: #444;
-            text-align: center;
+margin-top: 50px;
+font-size: 0.8rem;
+color: #444;
+text-align: center;
+
+        }
+
+        .overlay-image {
+            position: absolute;
+            top: 20px; /* Distance from top of container */
+            left: 20px; /* Distance from left of container */
+            z-index: 2; /* Higher layer than iframe */
+            pointer-events: none; /* Allows clicks to pass through to iframe */
         }
     </style>
 </head>
 
 <body style="align-items:center; background-color:#151515;">
     <div id="logo">
-        <a href="https://carzzyapps.github.io"><img src="/Carzzy Apps Logo.png" style="width:150px;height:50px;"></a>
+        <a href="https://carzzyapps.github.io"><img src="/Carzzy Apps Logo.png" style="width:150px;height:50px; " class="overlay-image"></a>
     </div>
 
     <div class="iframe-container">
