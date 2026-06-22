@@ -1,166 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Game Leaderboard</title>
+  <meta charset="UTF-8">
+  <title>Rhythm Runner | Leaderboard</title>
+
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #111827;
-      color: #e5e7eb;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-      padding-top: 40px;
-    }
-
-    .leaderboard-wrapper {
-      background: #1f2937;
-      padding: 24px 32px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-      width: 420px;
+      background: #0a0a0a;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 40px;
+      user-select: none;
     }
 
     h1 {
-      margin-top: 0;
-      text-align: center;
-      font-size: 24px;
-      letter-spacing: 0.05em;
+      color: #00d1b2;
+      margin-bottom: 10px;
     }
 
     table {
-      width: 100%;
+      width: 90%;
+      max-width: 600px;
+      margin: auto;
       border-collapse: collapse;
-      margin-top: 16px;
+      margin-top: 20px;
+      font-size: 18px;
     }
 
     th, td {
-      padding: 8px 10px;
-      text-align: left;
-      font-size: 14px;
+      padding: 12px;
+      border-bottom: 1px solid #00d1b2;
     }
 
     th {
-      background: #374151;
-      font-weight: 600;
+      color: #00d1b2;
+      font-size: 20px;
     }
 
-    tr:nth-child(even) td {
-      background: #111827;
+    tr:nth-child(even) {
+      background: rgba(0, 209, 178, 0.1);
     }
 
-    tr:nth-child(odd) td {
-      background: #1f2937;
-    }
-
-    .rank {
-      width: 50px;
-      text-align: center;
-    }
-
-    .username {
-      width: 180px;
-    }
-
-    .score {
-      width: 80px;
-      text-align: right;
-    }
-
-    .timestamp {
-      font-size: 12px;
-      color: #9ca3af;
-    }
-
-    .status {
-      margin-top: 10px;
-      font-size: 13px;
-      text-align: center;
-      color: #9ca3af;
+    #loading {
+      margin-top: 30px;
+      color: #00d1b2;
+      font-size: 20px;
     }
   </style>
 </head>
 <body>
-  <div class="leaderboard-wrapper">
-    <h1>Leaderboard</h1>
-    <div class="status" id="status">Loading leaderboard...</div>
-    <table>
-      <thead>
-        <tr>
-          <th class="rank">#</th>
-          <th class="username">Username</th>
-          <th class="score">Score</th>
-          <th>Time</th>
-        </tr>
-      </thead>
-      <tbody id="leaderboard-body">
-        <!-- Rows injected by JS -->
-      </tbody>
-    </table>
-  </div>
+
+  <h1>RHYTHM RUNNER — GLOBAL LEADERBOARD</h1>
+  <p>Top players ranked by highest score</p>
+
+  <div id="loading">Loading leaderboard...</div>
+
+  <table style="display:none;" id="leaderboardTable">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Username</th>
+        <th>Score</th>
+      </tr>
+    </thead>
+    <tbody id="leaderboard"></tbody>
+  </table>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzMkYex71b1PMQA951_AhanYyuZO-yXTJnO1WZrLk1SjBQ7bc6VFqJg7-uwTGN5en38ew/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbxwdmXDPCHPhqRjF8GyP89gcyZpqHLA6Ay_mA4NGRVUX5cOqFyJOhH1NFHJCEiuuxZboQ/exec";
 
     async function loadLeaderboard() {
-      const statusEl = document.getElementById("status");
-      const tbody = document.getElementById("leaderboard-body");
-
-      statusEl.textContent = "Loading leaderboard...";
-
       try {
-        const response = await fetch(API_URL);
-        if (!response.ok) {
-          throw new Error("HTTP " + response.status);
-        }
+        const res = await fetch(API_URL);
+        const data = await res.json();
 
-        const data = await response.json();
-
-        // Clear existing rows
+        const tbody = document.getElementById("leaderboard");
         tbody.innerHTML = "";
 
-        if (!data || data.length === 0) {
-          statusEl.textContent = "No scores yet. Be the first!";
-          return;
-        }
-
-        data.forEach((player, index) => {
+        data.forEach((row, i) => {
           const tr = document.createElement("tr");
-
-          const rankTd = document.createElement("td");
-          rankTd.className = "rank";
-          rankTd.textContent = index + 1;
-
-          const userTd = document.createElement("td");
-          userTd.className = "username";
-          userTd.textContent = player.username ?? "Unknown";
-
-          const scoreTd = document.createElement("td");
-          scoreTd.className = "score";
-          scoreTd.textContent = player.score ?? 0;
-
-          const timeTd = document.createElement("td");
-          const ts = player.timestamp || "";
-          timeTd.innerHTML = `<span class="timestamp">${ts}</span>`;
-
-          tr.appendChild(rankTd);
-          tr.appendChild(userTd);
-          tr.appendChild(scoreTd);
-          tr.appendChild(timeTd);
-
+          tr.innerHTML = `
+            <td>${i + 1}</td>
+            <td>${row.username}</td>
+            <td>${row.score}</td>
+          `;
           tbody.appendChild(tr);
         });
 
-        statusEl.textContent = `Loaded ${data.length} players`;
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("leaderboardTable").style.display = "table";
+
       } catch (err) {
-        console.error(err);
-        statusEl.textContent = "Error loading leaderboard.";
+        document.getElementById("loading").innerText = "Failed to load leaderboard.";
       }
     }
 
-    window.addEventListener("load", loadLeaderboard);
+    loadLeaderboard();
   </script>
+
 </body>
 </html>
